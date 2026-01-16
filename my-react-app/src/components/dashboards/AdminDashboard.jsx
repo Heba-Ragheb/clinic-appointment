@@ -7,7 +7,6 @@ import {
   Mail, Award, BarChart3, Bell,
   Download, RefreshCw, X
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
 import apiService from '../../services/api.service';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { Badge } from '../ui/Badge';
@@ -93,7 +92,6 @@ export const AdminDashboard = () => {
     }
   };
 
-  // Filter appointments
   const filteredAppointments = appointments.filter(apt => {
     const matchesStatus = filterStatus === 'all' || apt.status === filterStatus;
     const matchesSearch = searchTerm === '' || 
@@ -119,7 +117,6 @@ export const AdminDashboard = () => {
     return matchesStatus && matchesSearch && matchesDate;
   });
 
-  // Calculate comprehensive statistics
   const stats = {
     totalAppointments: appointments.length,
     totalDoctors: doctors.length,
@@ -135,7 +132,6 @@ export const AdminDashboard = () => {
     }).length
   };
 
-  // Calculate specialty distribution
   const specialtyStats = doctors.reduce((acc, doctor) => {
     const specialty = doctor.specialty || 'General';
     acc[specialty] = (acc[specialty] || 0) + 1;
@@ -158,7 +154,6 @@ export const AdminDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -169,11 +164,7 @@ export const AdminDashboard = () => {
             <Bell className="w-5 h-5 text-gray-600" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
-          <button 
-            onClick={loadData}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Refresh data"
-          >
+          <button onClick={loadData} className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Refresh data">
             <RefreshCw className="w-5 h-5 text-gray-600" />
           </button>
           <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -182,7 +173,6 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Error Alert */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -195,7 +185,6 @@ export const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Main Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-4">
@@ -207,9 +196,7 @@ export const AdminDashboard = () => {
           <p className="text-3xl font-bold mb-1">{stats.totalAppointments}</p>
           <p className="text-blue-100 text-sm">Total Appointments</p>
           <div className="mt-3 pt-3 border-t border-blue-400 border-opacity-30">
-            <p className="text-xs text-blue-100">
-              {stats.todayAppointments} scheduled today
-            </p>
+            <p className="text-xs text-blue-100">{stats.todayAppointments} scheduled today</p>
           </div>
         </div>
 
@@ -223,9 +210,7 @@ export const AdminDashboard = () => {
           <p className="text-3xl font-bold mb-1">{stats.totalDoctors}</p>
           <p className="text-green-100 text-sm">Active Doctors</p>
           <div className="mt-3 pt-3 border-t border-green-400 border-opacity-30">
-            <p className="text-xs text-green-100">
-              {Object.keys(specialtyStats).length} specialties
-            </p>
+            <p className="text-xs text-green-100">{Object.keys(specialtyStats).length} specialties</p>
           </div>
         </div>
 
@@ -239,9 +224,7 @@ export const AdminDashboard = () => {
           <p className="text-3xl font-bold mb-1">{stats.totalPatients}</p>
           <p className="text-purple-100 text-sm">Total Patients</p>
           <div className="mt-3 pt-3 border-t border-purple-400 border-opacity-30">
-            <p className="text-xs text-purple-100">
-              Registered users
-            </p>
+            <p className="text-xs text-purple-100">Registered users</p>
           </div>
         </div>
 
@@ -255,14 +238,11 @@ export const AdminDashboard = () => {
           <p className="text-3xl font-bold mb-1">{stats.pending}</p>
           <p className="text-yellow-100 text-sm">Pending Review</p>
           <div className="mt-3 pt-3 border-t border-yellow-400 border-opacity-30">
-            <p className="text-xs text-yellow-100">
-              Awaiting confirmation
-            </p>
+            <p className="text-xs text-yellow-100">Awaiting confirmation</p>
           </div>
         </div>
       </div>
 
-      {/* Secondary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between mb-3">
@@ -298,7 +278,6 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -344,7 +323,6 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Specialty Distribution */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Doctor Distribution by Specialty</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -360,7 +338,6 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Appointments Management */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900">All Appointments</h2>
@@ -412,19 +389,14 @@ export const AdminDashboard = () => {
         ) : (
           <div className="space-y-3">
             {filteredAppointments.map((apt) => (
-              <div
-                key={apt._id}
-                className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-all"
-              >
+              <div key={apt._id} className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-all">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
                       <Badge variant={getStatusVariant(apt.status)}>
                         {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
                       </Badge>
-                      <span className="text-xs text-gray-500">
-                        ID: {apt._id.slice(-8)}
-                      </span>
+                      <span className="text-xs text-gray-500">ID: {apt._id.slice(-8)}</span>
                       <span className="text-xs text-gray-500">
                         {new Date(apt.createdAt).toLocaleDateString('en-US', {
                           month: 'short',
@@ -437,16 +409,13 @@ export const AdminDashboard = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Patient Info */}
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold shadow-md">
                           {apt.patientId?.name?.charAt(0) || 'P'}
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 mb-1">Patient</p>
-                          <p className="font-semibold text-gray-900">
-                            {apt.patientId?.name || 'Unknown'}
-                          </p>
+                          <p className="font-semibold text-gray-900">{apt.patientId?.name || 'Unknown'}</p>
                           {apt.patientId?.email && (
                             <p className="text-xs text-gray-600 flex items-center gap-1 mt-1">
                               <Mail className="w-3 h-3" />
@@ -456,16 +425,13 @@ export const AdminDashboard = () => {
                         </div>
                       </div>
 
-                      {/* Doctor Info */}
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold shadow-md">
                           {apt.doctorId?.name?.charAt(0) || 'D'}
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 mb-1">Doctor</p>
-                          <p className="font-semibold text-gray-900">
-                            Dr. {apt.doctorId?.name || 'Unknown'}
-                          </p>
+                          <p className="font-semibold text-gray-900">Dr. {apt.doctorId?.name || 'Unknown'}</p>
                           <p className="text-xs text-blue-600 flex items-center gap-1 mt-1">
                             <Award className="w-3 h-3" />
                             {apt.doctorId?.specialty || 'General'}
@@ -533,7 +499,6 @@ export const AdminDashboard = () => {
         )}
       </div>
 
-      {/* System Health */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
           <div className="flex items-center gap-3 mb-4">
