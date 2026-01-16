@@ -28,13 +28,6 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   /**
-   * Check authentication status on mount
-   */
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  /**
    * Verify user authentication
    */
   const checkAuth = useCallback(async () => {
@@ -53,6 +46,13 @@ export const AuthProvider = ({ children }) => {
     
     setLoading(false);
   }, []);
+
+  /**
+   * Check authentication status on mount
+   */
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   /**
    * Login user

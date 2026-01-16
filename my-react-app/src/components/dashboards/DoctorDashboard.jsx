@@ -653,9 +653,10 @@ export const DoctorDashboard = () => {
                         <RefreshCw className="w-4 h-4 inline mr-2 animate-spin" />
                         Creating...
                       </>
-                    ) : (                      <>
+                    ) : (
+                      <>
                         <Save className="w-4 h-4 inline mr-2" />
-                        Create Slot
+                        Create Time Slot
                       </>
                     )}
                   </button>
@@ -663,61 +664,81 @@ export const DoctorDashboard = () => {
               </form>
             )}
           </div>
+
           {/* Time Slots List */}
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              My Time Slots
-            </h3>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">My Time Slots ({timeSlots.length})</h2>
 
             {timeSlots.length === 0 ? (
-              <div className="text-center py-10">
-                <Clock className="w-14 h-14 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 font-medium">
-                  No time slots created yet
-                </p>
+              <div className="text-center py-12">
+                <Clock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 font-medium">No time slots created</p>
+                <p className="text-gray-400 text-sm mt-1">Create your first time slot to start accepting appointments</p>
+                <button
+                  onClick={() => setShowCreateSlot(true)}
+                  className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4 inline mr-2" />
+                  Create Time Slot
+                </button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {timeSlots.map((slot) => (
                   <div
                     key={slot._id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-sm transition"
+                    className={`border-2 rounded-lg p-5 transition-all ${
+                      slot.isBooked
+                        ? 'border-red-200 bg-red-50'
+                        : 'border-green-200 bg-green-50 hover:shadow-md'
+                    }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-3 h-3 rounded-full ${
-                          slot.isBooked ? 'bg-red-500' : 'bg-green-500'
-                        }`}
-                      />
-                      <div>
-                        <p className="font-semibold text-gray-800">
-                          {formatDateTime(slot.startTime)} →{' '}
-                          {new Date(slot.endTime).toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {slot.isBooked ? 'Booked' : 'Available'}
-                        </p>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        slot.isBooked
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-green-100 text-green-700'
+                      }`}>
+                        {slot.isBooked ? 'Booked' : 'Available'}
                       </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
                       {!slot.isBooked && (
                         <button
                           onClick={() => handleDeleteSlot(slot._id)}
                           disabled={actionLoading === slot._id}
-                          className="p-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition"
-                          title="Delete Slot"
+                          className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                          title="Delete slot"
                         >
                           {actionLoading === slot._id ? (
-                            <div className="w-4 h-4 border-b-2 border-red-600 animate-spin rounded-full" />
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
                           ) : (
                             <Trash2 className="w-4 h-4" />
                           )}
                         </button>
                       )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <Clock className="w-4 h-4 text-blue-600" />
+                        <span className="font-medium text-sm">Start</span>
+                      </div>
+                      <p className="text-gray-900 font-semibold ml-6">
+                        {formatDateTime(slot.startTime)}
+                      </p>
+
+                      <div className="flex items-center gap-2 text-gray-700 mt-3">
+                        <Clock className="w-4 h-4 text-purple-600" />
+                        <span className="font-medium text-sm">End</span>
+                      </div>
+                      <p className="text-gray-900 font-semibold ml-6">
+                        {formatDateTime(slot.endTime)}
+                      </p>
+
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">
+                          Slot ID: {slot._id.slice(-8)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -729,3 +750,5 @@ export const DoctorDashboard = () => {
     </div>
   );
 };
+
+export default DoctorDashboard;
