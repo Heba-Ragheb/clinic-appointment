@@ -26,6 +26,30 @@ export const PatientDashboard = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
 
+  const loadAppointments = useCallback(async () => {
+    try {
+      const data = await apiService.getAppointments();
+      const allAppointments = data.data || data.appointments || [];
+      const patientAppointments = allAppointments.filter(
+        apt => apt.patientId?._id === user._id || apt.patientId === user._id
+      );
+      setAppointments(patientAppointments);
+    } catch (err) {
+      console.error('Error loading appointments:', err);
+      setAppointments([]);
+    }
+  }, [user._id]);
+
+  const loadDoctors = useCallback(async () => {
+    try {
+      const data = await apiService.getDoctors();
+      setDoctors(data.data || data.doctors || []);
+    } catch (err) {
+      console.error('Error loading doctors:', err);
+      setDoctors([]);
+    }
+  }, []);
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -40,35 +64,11 @@ export const PatientDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadAppointments, loadDoctors]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  const loadAppointments = async () => {
-    try {
-      const data = await apiService.getAppointments();
-      const allAppointments = data.data || data.appointments || [];
-      const patientAppointments = allAppointments.filter(
-        apt => apt.patientId?._id === user._id || apt.patientId === user._id
-      );
-      setAppointments(patientAppointments);
-    } catch (err) {
-      console.error('Error loading appointments:', err);
-      setAppointments([]);
-    }
-  };
-
-  const loadDoctors = async () => {
-    try {
-      const data = await apiService.getDoctors();
-      setDoctors(data.data || data.doctors || []);
-    } catch (err) {
-      console.error('Error loading doctors:', err);
-      setDoctors([]);
-    }
-  };
 
   const handleCancelAppointment = async (appointmentId) => {
     if (!window.confirm('Are you sure you want to cancel this appointment?')) {

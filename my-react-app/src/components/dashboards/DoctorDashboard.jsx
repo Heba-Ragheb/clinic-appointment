@@ -1,10 +1,10 @@
 // components/dashboards/DoctorDashboard.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Calendar, Clock, Users, Activity, TrendingUp, Plus,
-  Search, Filter, CheckCircle, XCircle, AlertCircle, Eye,
-  Edit, Trash2, Save, X, RefreshCw, Bell, Settings,
-  Stethoscope, Mail, Phone, Award, BarChart3
+  Search, CheckCircle, XCircle, AlertCircle, Eye,
+  Trash2, Save, X, RefreshCw, Bell, Settings,
+  Stethoscope, Mail, Phone, BarChart3
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import apiService from '../../services/api.service';
@@ -25,17 +25,37 @@ export const DoctorDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [showCreateSlot, setShowCreateSlot] = useState(false);
-  const [editingSlot, setEditingSlot] = useState(null);
   const [newSlot, setNewSlot] = useState({
     startTime: '',
     endTime: ''
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const loadAppointments = useCallback(async () => {
+    try {
+      const data = await apiService.getAppointments();
+      const allAppointments = data.data || data.appointments || [];
+      // Filter appointments for this doctor
+      const doctorAppointments = allAppointments.filter(
+        apt => apt.doctorId?._id === user._id || apt.doctorId === user._id
+      );
+      setAppointments(doctorAppointments);
+    } catch (err) {
+      console.error('Error loading appointments:', err);
+      setAppointments([]);
+    }
+  }, [user._id]);
 
-  const loadData = async () => {
+  const loadTimeSlots = useCallback(async () => {
+    try {
+      const data = await apiService.getAvailableSlots(user._id);
+      setTimeSlots(data || []);
+    } catch (err) {
+      console.error('Error loading time slots:', err);
+      setTimeSlots([]);
+    }
+  }, [user._id]);
+
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -49,32 +69,11 @@ export const DoctorDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loadAppointments, loadTimeSlots]);
 
-  const loadAppointments = async () => {
-    try {
-      const data = await apiService.getAppointments();
-      const allAppointments = data.data || data.appointments || [];
-      // Filter appointments for this doctor
-      const doctorAppointments = allAppointments.filter(
-        apt => apt.doctorId?._id === user._id || apt.doctorId === user._id
-      );
-      setAppointments(doctorAppointments);
-    } catch (err) {
-      console.error('Error loading appointments:', err);
-      setAppointments([]);
-    }
-  };
-
-  const loadTimeSlots = async () => {
-    try {
-      const data = await apiService.getAvailableSlots(user._id);
-      setTimeSlots(data || []);
-    } catch (err) {
-      console.error('Error loading time slots:', err);
-      setTimeSlots([]);
-    }
-  };
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleCreateSlot = async (e) => {
     e.preventDefault();
