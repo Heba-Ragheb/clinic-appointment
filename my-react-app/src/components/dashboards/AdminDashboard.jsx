@@ -1,11 +1,11 @@
 // components/dashboards/AdminDashboard.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Users, Calendar, Activity, TrendingUp, Shield, Settings,
-  Search, Filter, MoreVertical, Eye, Edit, Trash2, UserCheck,
-  UserX, Stethoscope, AlertCircle, CheckCircle, XCircle, Clock,
-  Mail, Phone, Award, BarChart3, PieChart, DollarSign, Bell,
-  Download, Upload, RefreshCw, ChevronRight, X, Plus
+  Search, MoreVertical, Eye, Edit, UserCheck,
+  Stethoscope, AlertCircle, CheckCircle, XCircle, Clock,
+  Mail, Award, BarChart3, Bell,
+  Download, RefreshCw, X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import apiService from '../../services/api.service';
@@ -16,7 +16,6 @@ import { Badge } from '../ui/Badge';
  * Professional Admin Dashboard Component
  */
 export const AdminDashboard = () => {
-  const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,14 +23,29 @@ export const AdminDashboard = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [selectedView, setSelectedView] = useState('overview');
   const [dateRange, setDateRange] = useState('all');
 
-  useEffect(() => {
-    loadData();
+  const loadAppointments = useCallback(async () => {
+    try {
+      const data = await apiService.getAppointments();
+      setAppointments(data.data || data.appointments || []);
+    } catch (err) {
+      console.error('Error loading appointments:', err);
+      setAppointments([]);
+    }
   }, []);
 
-  const loadData = async () => {
+  const loadDoctors = useCallback(async () => {
+    try {
+      const data = await apiService.getDoctors();
+      setDoctors(data.data || data.doctors || []);
+    } catch (err) {
+      console.error('Error loading doctors:', err);
+      setDoctors([]);
+    }
+  }, []);
+
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -45,27 +59,11 @@ export const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loadAppointments, loadDoctors]);
 
-  const loadAppointments = async () => {
-    try {
-      const data = await apiService.getAppointments();
-      setAppointments(data.data || data.appointments || []);
-    } catch (err) {
-      console.error('Error loading appointments:', err);
-      setAppointments([]);
-    }
-  };
-
-  const loadDoctors = async () => {
-    try {
-      const data = await apiService.getDoctors();
-      setDoctors(data.data || data.doctors || []);
-    } catch (err) {
-      console.error('Error loading doctors:', err);
-      setDoctors([]);
-    }
-  };
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleCancelAppointment = async (appointmentId) => {
     if (!window.confirm('Are you sure you want to cancel this appointment?')) {
