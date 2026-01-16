@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Users, Calendar, Activity, TrendingUp, Shield, Settings,
-  Search, MoreVertical, Eye, Edit, UserCheck,
+  Search,  UserCheck,
   Stethoscope, AlertCircle, CheckCircle, XCircle, Clock,
   Mail, Award, BarChart3, Bell,
   Download, RefreshCw, X

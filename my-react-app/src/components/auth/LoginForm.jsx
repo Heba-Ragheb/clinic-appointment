@@ -1,6 +1,6 @@
 // components/auth/LoginForm.jsx
 import React, { useState } from 'react';
-import { Stethoscope, AlertCircle } from 'lucide-react';
+import { Stethoscope } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
