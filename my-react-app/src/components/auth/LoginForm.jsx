@@ -1,6 +1,6 @@
 // components/auth/LoginForm.jsx
 import React, { useState } from 'react';
-import { Stethoscope } from 'lucide-react';
+import { Stethoscope, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -61,75 +61,93 @@ export const LoginForm = ({ onSwitchToRegister }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 flex items-center justify-center p-4">
-      {/* Background Overlay */}
-      <div className="absolute inset-0 bg-black opacity-20"></div>
-      
-      {/* Login Card */}
-      <div className="relative bg-white rounded-3xl shadow-2xl p-10 w-full max-w-md">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full mb-4 shadow-lg">
-            <Stethoscope className="w-10 h-10 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg">
+            <Stethoscope className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to manage your appointments</p>
         </div>
 
-        {/* Error Alert */}
-        {error && (
-          <Alert 
-            type="error" 
-            message={error}
-            onClose={() => setError('')}
-          />
-        )}
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          {/* Error Alert */}
+          {error && (
+            <Alert 
+              type="error" 
+              message={error}
+              onClose={() => setError('')}
+            />
+          )}
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <Input
-            label="Email Address"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="doctor@hospital.com"
-            required
-            autoComplete="email"
-          />
+          {/* Login Form */}
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="doctor@hospital.com"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                  autoComplete="email"
+                />
+              </div>
+            </div>
 
-          <Input
-            label="Password"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="••••••••"
-            required
-            autoComplete="current-password"
-          />
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            loading={loading}
-            className="w-full"
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </Button>
-        </form>
-
-        {/* Footer */}
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <button 
-              onClick={onSwitchToRegister}
-              className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors"
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              disabled={loading}
+              loading={loading}
+              className="w-full"
             >
-              Create Account
-            </button>
-          </p>
+              {loading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{' '}
+              <button 
+                onClick={onSwitchToRegister}
+                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                Create Account
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>

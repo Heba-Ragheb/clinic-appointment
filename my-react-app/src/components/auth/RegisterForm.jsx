@@ -1,6 +1,6 @@
 // components/auth/RegisterForm.jsx
 import React, { useState } from 'react';
-import { UserCheck } from 'lucide-react';
+import { UserCheck, Mail, Lock, Phone, User, Briefcase, FileText } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
@@ -110,141 +110,221 @@ export const RegisterForm = ({ onSwitchToLogin }) => {
   const isDoctorRole = formData.role === 'Doctor';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-indigo-700 to-purple-800 flex items-center justify-center p-4">
-      {/* Background Overlay */}
-      <div className="absolute inset-0 bg-black opacity-20"></div>
-      
-      {/* Registration Card */}
-      <div className="relative bg-white rounded-3xl shadow-2xl p-10 w-full max-w-2xl my-8">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 py-12">
+      <div className="w-full max-w-3xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full mb-4 shadow-lg">
-            <UserCheck className="w-10 h-10 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4 shadow-lg">
+            <UserCheck className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Create Account</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
           <p className="text-gray-600">Join our medical appointment platform</p>
         </div>
 
-        {/* Error Alert */}
-        {error && (
-          <Alert 
-            type="error" 
-            message={error}
-            onClose={() => setError('')}
-          />
-        )}
-
-        {/* Registration Form */}
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <Input
-              label="Full Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Dr. John Doe"
-              required
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          {/* Error Alert */}
+          {error && (
+            <Alert 
+              type="error" 
+              message={error}
+              onClose={() => setError('')}
             />
+          )}
 
-            <Input
-              label="Email"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="email@example.com"
-              required
-            />
-
-            <Input
-              label="Password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-            />
-
-            <Input
-              label="Confirm Password"
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="••••••••"
-              required
-            />
-
-            <Input
-              label="Phone"
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="+1 234 567 8900"
-            />
-
-            <Select
-              label="Role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              options={ROLE_OPTIONS}
-              required
-            />
-
-            {/* Doctor-specific fields */}
-            {isDoctorRole && (
-              <>
-                <div className="md:col-span-2">
-                  <Input
-                    label="Specialty"
-                    name="specialty"
-                    value={formData.specialty}
+          {/* Registration Form */}
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Full Name */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <input
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
-                    placeholder="e.g., Cardiology, Neurology"
-                    required={isDoctorRole}
+                    placeholder="Dr. John Doe"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                    required
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Bio
-                  </label>
-                  <textarea
-                    name="bio"
-                    value={formData.bio}
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Email
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    rows="3"
-                    placeholder="Brief description about yourself..."
+                    placeholder="email@example.com"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                    required
                   />
                 </div>
-              </>
-            )}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Phone
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="+1 234 567 8900"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Role */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Role
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <Briefcase className="w-5 h-5" />
+                  </div>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none appearance-none bg-white"
+                    required
+                  >
+                    {ROLE_OPTIONS.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Doctor-specific fields */}
+              {isDoctorRole && (
+                <>
+                  <div className="md:col-span-2">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Specialty
+                      </label>
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          <Briefcase className="w-5 h-5" />
+                        </div>
+                        <input
+                          name="specialty"
+                          value={formData.specialty}
+                          onChange={handleChange}
+                          placeholder="e.g., Cardiology, Neurology"
+                          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none"
+                          required={isDoctorRole}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="md:col-span-2 space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Bio</label>
+                    <div className="relative">
+                      <FileText className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
+                      <textarea
+                        name="bio"
+                        value={formData.bio}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none resize-none"
+                        rows="3"
+                        placeholder="Brief description about yourself..."
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              onClick={handleSubmit}
+              disabled={loading}
+              loading={loading}
+              className="w-full mt-6"
+            >
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </Button>
           </div>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            loading={loading}
-            className="w-full mt-6"
-          >
-            {loading ? 'Creating Account...' : 'Create Account'}
-          </Button>
-        </form>
-
-        {/* Footer */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <button 
-              onClick={onSwitchToLogin}
-              className="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors"
-            >
-              Sign In
-            </button>
-          </p>
+          {/* Footer */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Already have an account?{' '}
+              <button 
+                onClick={onSwitchToLogin}
+                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              >
+                Sign In
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>
