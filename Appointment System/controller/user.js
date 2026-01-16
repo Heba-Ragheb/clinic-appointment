@@ -110,3 +110,70 @@ export const logout = async(req, res) => {
         });
     }
 }
+// Get doctors by specialty (public / patient)
+export const getDoctorsBySpecialty = async (req, res) => {
+  try {
+    const { specialty } = req.query;
+
+    if (!specialty) {
+      return res.status(400).json({ message: "Specialty is required" });
+    }
+
+    const doctors = await User.find({
+      role: "Doctor",
+      specialty: { $regex: specialty, $options: "i" },
+    }).select("-password");
+
+    res.status(200).json({
+      success: true,
+      count: doctors.length,
+      doctors,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch doctors",
+      error: error.message,
+    });
+  }
+};
+export const getAllDoctorss = async (req, res) => {
+  try {
+       const doctors = await User.find({
+      role: "Doctor",
+        }).select("-password");
+
+    res.status(200).json({
+      success: true,
+      count: doctors.length,
+      doctors,
+    });
+   
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch users",
+      error: error.message,
+    });
+  }
+};
+
+// Admin only
+export const getAllUsers = async (req, res) => {
+  try {
+    if (req.user.role !== "Admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const users = await User.find().select("-password");
+
+    res.status(200).json({
+      success: true,
+      total: users.length,
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch users",
+      error: error.message,
+    });
+  }
+};

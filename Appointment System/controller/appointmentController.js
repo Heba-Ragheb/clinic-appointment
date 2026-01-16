@@ -18,19 +18,37 @@ export const store = async (req, res) => {
 
     const patientId = req.user._id;
     const { slotId } = req.body;
-
-    // Fetch slot
-    const slot = await TimeSlot.findById(slotId).session(session);
-    if (!slot || slot.isBooked) {
-      await session.abortTransaction();
-      return res.status(400).json({ message: "Slot not available" });
-    }
-
-    const doctorId = slot.doctor;
-
+    const doctorId = req.params.id;
+    
+    // Validate patient can't book themselves
     if (patientId.toString() === doctorId.toString()) {
       await session.abortTransaction();
       return res.status(400).json({ message: "Cannot book yourself" });
+    }
+
+    // Fetch and lock the slot
+    const slot = await TimeSlot.findById(slotId).session(session);
+    
+    if (!slot) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: "Time slot not found" });
+    }
+
+    if (slot.isBooked) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: "This time slot is already booked" });
+    }
+
+    // Check if an appointment already exists for this slot
+    const existingAppointment = await Appointment.findOne({ 
+      timeSlotId: slotId 
+    }).session(session);
+
+    if (existingAppointment) {
+      await session.abortTransaction();
+      return res.status(400).json({ 
+        message: "An appointment already exists for this time slot" 
+      });
     }
 
     // Create appointment
@@ -64,7 +82,13 @@ export const store = async (req, res) => {
     );
 
     await session.commitTransaction();
-    await invalidateCache(["/api/appointments", "/api/slots"]);
+    
+    // Invalidate relevant caches
+    await invalidateCache([
+      "/api/appointments", 
+      "/api/slots",
+      `/api/timeSlot/doctor/${doctorId}`
+    ]);
 
     res.status(201).json({
       message: "Appointment booked successfully",
@@ -72,6 +96,7 @@ export const store = async (req, res) => {
     });
   } catch (error) {
     await session.abortTransaction();
+    console.error("Booking error:", error);
     res.status(500).json({
       message: "Failed to book appointment",
       error: error.message,
@@ -114,7 +139,10 @@ export const deleteAppointUser = async (req, res) => {
     );
 
     await session.commitTransaction();
-    await invalidateCache(["/api/appointments"]);
+    await invalidateCache([
+      "/api/appointments",
+      `/api/timeSlot/doctor/${appointment.doctorId}`
+    ]);
 
     res.json({ message: "Appointment cancelled successfully" });
   } catch (error) {
@@ -134,7 +162,6 @@ export const deleteAppointDoctor = async (req, res) => {
     const role = req.user.role;
     const appointmentId = req.params.id;
 
-    // Check if user is authorized
     if (role === "Patient") {
       await session.abortTransaction();
       return res.status(403).json({ message: "Not authorized" });
@@ -147,7 +174,6 @@ export const deleteAppointDoctor = async (req, res) => {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
-    // Check if doctor owns this appointment
     if (
       role === "Doctor" &&
       appointment.doctorId.toString() !== req.user._id.toString()
@@ -183,6 +209,7 @@ export const deleteAppointDoctor = async (req, res) => {
     await invalidateCache([
       `/api/appointments/${appointmentId}`,
       `/api/appointments`,
+      `/api/timeSlot/doctor/${appointment.doctorId}`
     ]);
 
     res.json({ message: "Appointment cancelled successfully", data: [] });
@@ -207,7 +234,6 @@ export const update = async (req, res) => {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
-    // Check authorization
     if (
       req.user.role === "Patient" &&
       appointment.patientId.toString() !== req.user._id.toString()
@@ -237,7 +263,6 @@ export const index = async (req, res) => {
     const role = req.user.role;
     const userId = req.user._id;
 
-    // Build filter based on role
     let filter = {};
     if (role === "Doctor") {
       filter = { doctorId: userId };
@@ -246,25 +271,21 @@ export const index = async (req, res) => {
     } else if (role === "Patient") {
       filter = { patientId: userId };
     }
-    // Admin sees all appointments (no filter)
 
-    // Pagination setup
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch appointments with proper population
     const appointments = await Appointment.find(filter)
       .populate("patientId", "name email phone")
       .populate("doctorId", "name email specialty")
-      .populate("timeSlotId", "startTime endTime")
+      .populate("timeSlotId", "startTime endTime isBooked")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
     const totalAppointments = await Appointment.countDocuments(filter);
 
-    // ✅ RETURN EMPTY ARRAY INSTEAD OF 404
     res.status(200).json({
       message: appointments.length > 0 
         ? "Appointments retrieved successfully" 
@@ -291,13 +312,12 @@ export const show = async (req, res, next) => {
     const appointment = await Appointment.findById(id)
       .populate("patientId", "name email phone")
       .populate("doctorId", "name email specialty")
-      .populate("timeSlotId", "startTime endTime");
+      .populate("timeSlotId", "startTime endTime isBooked");
 
     if (!appointment) {
       return next(errorHandler(404, "Appointment not found"));
     }
 
-    // Check authorization
     if (
       user.role !== "Admin" &&
       user.role !== "Nurse" &&

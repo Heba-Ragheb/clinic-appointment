@@ -10,18 +10,21 @@ export const API_CONFIG = {
       LOGIN: '/user/login',
       REGISTER: '/user/register',
       ME: '/user/me',
-      LOGOUT: '/user/logout'
+      LOGOUT: '/user/logout',
+      ALL_DOCTORS: '/user/allDoctors',
+      DOCTORS_BY_SPECIALTY: '/user/doctors'
     },
     APPOINTMENTS: {
       BASE: '/appointments',
       BY_ID: (id) => `/appointments/${id}`,
-      CREATE: '/appointments/doctor/:id',
+      CREATE: (doctorId) => `/appointments/doctor/${doctorId}`,
       DELETE_USER: (id) => `/appointments/user/${id}`,
       DELETE_DOCTOR: (id) => `/appointments/doctor/${id}`
     },
     TIME_SLOTS: {
       CREATE: '/timeSlot/create',
       BASE: '/timeSlot',
+      BY_DOCTOR: (doctorId) => `/timeSlot/doctor/${doctorId}`,
       DELETE: (id) => `/timeSlot/${id}`
     }
   }
@@ -120,6 +123,18 @@ class ApiService {
   }
 
   /**
+   * Doctor Methods
+   */
+  async getDoctors() {
+    return this.request(API_CONFIG.ENDPOINTS.USER.ALL_DOCTORS);
+  }
+
+  async getDoctorsBySpecialty(specialty) {
+    const queryParams = new URLSearchParams({ specialty });
+    return this.request(`${API_CONFIG.ENDPOINTS.USER.DOCTORS_BY_SPECIALTY}?${queryParams}`);
+  }
+
+  /**
    * Appointment Methods
    */
   async getAppointments(page = 1, filters = {}) {
@@ -132,7 +147,7 @@ class ApiService {
   }
 
   async createAppointment(doctorId, slotId) {
-    return this.request(API_CONFIG.ENDPOINTS.APPOINTMENTS.CREATE.replace(':id', doctorId), {
+    return this.request(API_CONFIG.ENDPOINTS.APPOINTMENTS.CREATE(doctorId), {
       method: 'POST',
       body: JSON.stringify({ slotId })
     });
@@ -168,8 +183,10 @@ class ApiService {
   }
 
   async getAvailableSlots(doctorId, date) {
-    const queryParams = new URLSearchParams({ doctorId, date });
-    return this.request(`${API_CONFIG.ENDPOINTS.TIME_SLOTS.BASE}?${queryParams}`);
+    const params = new URLSearchParams({ doctorId });
+    if (date) params.append("date", date);
+
+    return this.request(`${API_CONFIG.ENDPOINTS.TIME_SLOTS.BASE}?${params.toString()}`);
   }
 
   async deleteTimeSlot(id) {
