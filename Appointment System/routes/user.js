@@ -11,6 +11,7 @@ router.get("/doctors", userController.getDoctorsBySpecialty);
 router.get("/allDoctors", userController.getAllDoctorss);
 // Admin
 router.get("/", authJwt, userController.getAllUsers);
+router.get('/allPatients', authJwt, userController.getAllPatients);
 
 
 export default router

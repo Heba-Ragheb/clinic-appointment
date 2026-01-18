@@ -155,7 +155,24 @@ export const getAllDoctorss = async (req, res) => {
     });
   }
 };
-
+export const getAllPatients = async(req,res)=>{
+  try {
+     if (req.user.role !== "Admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+    const patients = await User.find({role:"Patient"}).select("-password");
+     res.status(200).json({
+      success: true,
+      count: patients.length,
+      patients,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch users",
+      error: error.message,
+    });
+  }
+}
 // Admin only
 export const getAllUsers = async (req, res) => {
   try {
@@ -165,10 +182,16 @@ export const getAllUsers = async (req, res) => {
 
     const users = await User.find().select("-password");
 
-    res.status(200).json({
+   res.status(200).json({
       success: true,
-      total: users.length,
-      users,
+      data: users,
+      counts: {
+        total: users.length,
+        patients: users.filter(u => u.role === 'Patient').length,
+        doctors: users.filter(u => u.role === 'Doctor').length,
+        nurses: users.filter(u => u.role === 'Nurse').length,
+        admins: users.filter(u => u.role === 'Admin').length
+      }
     });
   } catch (error) {
     res.status(500).json({

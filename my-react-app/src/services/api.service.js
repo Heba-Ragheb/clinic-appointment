@@ -12,6 +12,8 @@ export const API_CONFIG = {
       ME: '/user/me',
       LOGOUT: '/user/logout',
       ALL_DOCTORS: '/user/allDoctors',
+      ALL_PATIENTS: '/user/allPatients',
+      ALL_USERS: '/user/all',
       DOCTORS_BY_SPECIALTY: '/user/doctors'
     },
     APPOINTMENTS: {
@@ -133,6 +135,26 @@ class ApiService {
   async getDoctorsBySpecialty(specialty) {
     const queryParams = new URLSearchParams({ specialty });
     return this.request(`${API_CONFIG.ENDPOINTS.USER.DOCTORS_BY_SPECIALTY}?${queryParams}`);
+  }
+
+  /**
+   * Patient Methods
+   */
+  async getPatients() {
+    try {
+      return this.request(API_CONFIG.ENDPOINTS.USER.ALL_PATIENTS);
+    } catch (error) {
+      // If endpoint doesn't exist, return empty array instead of throwing
+      console.warn('Patients endpoint not available:', error.message);
+      return { data: [], patients: [] };
+    }
+  }
+
+  /**
+   * Get all users (for admin)
+   */
+  async getAllUsers() {
+    return this.request(API_CONFIG.ENDPOINTS.USER.ALL_USERS);
   }
 
   /**
