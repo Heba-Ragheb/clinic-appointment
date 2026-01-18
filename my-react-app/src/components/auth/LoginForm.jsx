@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Stethoscope, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Input } from '../ui/Input';
+//import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
 

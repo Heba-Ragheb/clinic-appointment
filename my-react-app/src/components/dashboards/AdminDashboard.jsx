@@ -175,7 +175,7 @@ export const AdminDashboard = () => {
     return matchesStatus && matchesSearch;
   });
 
-  const filteredDoctors = doctors.filter(doctor => {
+/*  const filteredDoctors = doctors.filter(doctor => {
     const matchesSpecialty = filterSpecialty === 'all' || doctor.specialty === filterSpecialty;
     const matchesSearch = searchTerm === '' ||
       doctor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -183,7 +183,7 @@ export const AdminDashboard = () => {
       doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase());
     
     return matchesSpecialty && matchesSearch;
-  });
+  });*/
 
   const filteredPatients = patients.filter(patient => {
     return searchTerm === '' ||

@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { UserCheck, Mail, Lock, Phone, User, Briefcase, FileText } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Input } from '../ui/Input';
-import { Select } from '../ui/Select';
+//import { Input } from '../ui/Input';
+//import { Select } from '../ui/Select';
 import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
 
