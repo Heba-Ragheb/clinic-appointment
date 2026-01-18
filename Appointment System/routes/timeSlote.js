@@ -4,6 +4,7 @@ import {
   getAvailableSlots,
   deleteSlot,
   markSlotBooked,
+  getUnbookedSlots,
 } from "../controller/timeSlot.js";
 import { authJwt } from "../middleware/auth.js";
 
@@ -20,5 +21,6 @@ router.patch("/:id/book", authJwt, markSlotBooked);
 
 // Delete slot (doctor only)
 router.delete("/:id", authJwt, deleteSlot);
+router.get("/available", authJwt, getUnbookedSlots);
 
 export default router;

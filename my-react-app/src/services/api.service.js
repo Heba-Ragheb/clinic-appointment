@@ -24,6 +24,7 @@ export const API_CONFIG = {
     TIME_SLOTS: {
       CREATE: '/timeSlot/create',
       BASE: '/timeSlot',
+      AVAILABLE: '/timeSlot/available', // For patient booking (unbooked only)
       BY_DOCTOR: (doctorId) => `/timeSlot/doctor/${doctorId}`,
       DELETE: (id) => `/timeSlot/${id}`
     }
@@ -176,17 +177,35 @@ class ApiService {
    * Time Slot Methods
    */
   async createTimeSlot(slotData) {
+    console.log('Creating time slot:', slotData);
     return this.request(API_CONFIG.ENDPOINTS.TIME_SLOTS.CREATE, {
       method: 'POST',
       body: JSON.stringify(slotData)
     });
   }
 
+  /**
+   * Get all slots for a doctor (for doctor dashboard - shows ALL slots)
+   * @param {string} doctorId - Doctor's ID
+   * @param {string} date - Optional date filter
+   */
   async getAvailableSlots(doctorId, date) {
     const params = new URLSearchParams({ doctorId });
     if (date) params.append("date", date);
 
     return this.request(`${API_CONFIG.ENDPOINTS.TIME_SLOTS.BASE}?${params.toString()}`);
+  }
+
+  /**
+   * Get only unbooked slots (for patient booking)
+   * @param {string} doctorId - Doctor's ID
+   * @param {string} date - Optional date filter
+   */
+  async getUnbookedSlots(doctorId, date) {
+    const params = new URLSearchParams({ doctorId });
+    if (date) params.append("date", date);
+
+    return this.request(`${API_CONFIG.ENDPOINTS.TIME_SLOTS.AVAILABLE}?${params.toString()}`);
   }
 
   async deleteTimeSlot(id) {

@@ -45,15 +45,16 @@ export const DoctorDashboard = () => {
     }
   }, [user._id]);
 
-  const loadTimeSlots = useCallback(async () => {
-    try {
-      const data = await apiService.getAvailableSlots(user._id);
-      setTimeSlots(data || []);
-    } catch (err) {
-      console.error('Error loading time slots:', err);
-      setTimeSlots([]);
-    }
-  }, [user._id]);
+ const loadTimeSlots = useCallback(async () => {
+  try {
+    // Remove date parameter to get ALL slots for the doctor
+    const data = await apiService.getAvailableSlots(user._id);
+    setTimeSlots(data || []);
+  } catch (err) {
+    console.error('Error loading time slots:', err);
+    setTimeSlots([]);
+  }
+}, [user._id]);
 
   const loadData = useCallback(async () => {
     try {
@@ -75,30 +76,43 @@ export const DoctorDashboard = () => {
     loadData();
   }, [loadData]);
 
-  const handleCreateSlot = async (e) => {
-    e.preventDefault();
-    
-    if (!newSlot.startTime || !newSlot.endTime) {
-      alert('Please fill in all fields');
-      return;
-    }
+ const handleCreateSlot = async (e) => {
+  e.preventDefault();
+  
+  if (!newSlot.startTime || !newSlot.endTime) {
+    alert('Please fill in all fields');
+    return;
+  }
 
-    try {
-      setActionLoading('create');
-      await apiService.createTimeSlot({
-        startTime: newSlot.startTime,
-        endTime: newSlot.endTime
-      });
-      
-      setNewSlot({ startTime: '', endTime: '' });
-      setShowCreateSlot(false);
-      await loadTimeSlots();
-    } catch (err) {
-      alert(err.message || 'Failed to create time slot');
-    } finally {
-      setActionLoading(null);
-    }
-  };
+  // Validate that end time is after start time
+  const startDate = new Date(newSlot.startTime);
+  const endDate = new Date(newSlot.endTime);
+  
+  if (startDate >= endDate) {
+    alert('End time must be after start time');
+    return;
+  }
+
+  try {
+    setActionLoading('create');
+    
+    // Send ISO string format to backend
+    await apiService.createTimeSlot({
+      startTime: startDate.toISOString(),
+      endTime: endDate.toISOString()
+    });
+    
+    setNewSlot({ startTime: '', endTime: '' });
+    setShowCreateSlot(false);
+    await loadTimeSlots();
+    alert('Time slot created successfully!');
+  } catch (err) {
+    console.error('Create slot error:', err);
+    alert(err.message || 'Failed to create time slot');
+  } finally {
+    setActionLoading(null);
+  }
+};
 
   const handleDeleteSlot = async (slotId) => {
     if (!window.confirm('Are you sure you want to delete this time slot?')) {
@@ -617,30 +631,33 @@ export const DoctorDashboard = () => {
 
             {showCreateSlot && (
               <form onSubmit={handleCreateSlot} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Start Time
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={newSlot.startTime}
-                    onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    End Time
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={newSlot.endTime}
-                    onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
+               <div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    Start Time
+  </label>
+  <input
+    type="datetime-local"
+    value={newSlot.startTime}
+    onChange={(e) => setNewSlot({ ...newSlot, startTime: e.target.value })}
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    min={new Date().toISOString().slice(0, 16)} // Prevent past dates
+    required
+  />
+</div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">
+    End Time
+  </label>
+  <input
+    type="datetime-local"
+    value={newSlot.endTime}
+    onChange={(e) => setNewSlot({ ...newSlot, endTime: e.target.value })}
+    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    min={newSlot.startTime || new Date().toISOString().slice(0, 16)} // Must be after start time
+    required
+  />
+</div>
+                 
                 <div className="md:col-span-2">
                   <button
                     type="submit"
